@@ -22,7 +22,7 @@ class ExploreScreen extends StatelessWidget {
           // TODO: Replace this with TodayRecipeListView
           return Center(
             child: Container(
-              child: const Text('Show TodayRecipeListView'),
+              child: const Text('Show Today RecipeListView'),
             ),
           );
         } else {
