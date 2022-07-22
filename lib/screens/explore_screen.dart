@@ -3,30 +3,59 @@ import '../components/components.dart';
 import '../models/models.dart';
 import '../api/mock_fooderlich_service.dart';
 
-class ExploreScreen extends StatelessWidget {
+class ExploreScreen extends StatefulWidget {
+  ExploreScreen({Key? key}) : super(key: key);
+  @override
+  @override
+  State<ExploreScreen> createState() => _ExploreScreenState();
+}
+
+class _ExploreScreenState extends State<ExploreScreen> {
   // 1
   final mockService = MockFooderlichService();
-  ExploreScreen({Key? key}) : super(key: key);
+  late ScrollController _controller;
+  @override
+  void initState() {
+    super.initState();
+    _controller = ScrollController();
+    _controller.addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    if (_controller.offset >= _controller.position.maxScrollExtent &&
+        !_controller.position.outOfRange) {
+      print('i am at the bottom');
+    }
+    if (_controller.offset <= _controller.position.minScrollExtent &&
+        !_controller.position.outOfRange) {
+      print('i am at the top');
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_scrollListener);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     // 2
-    // TODO 1: Add TodayRecipeListView FutureBuilder
+
     return FutureBuilder(
       future: mockService.getExploreData(),
       builder: (context, AsyncSnapshot<ExploreData> snapshot) {
-        // TODO: Add Nested List Views
-        // 4
         if (snapshot.connectionState == ConnectionState.done) {
-          // 5
-          final recipes = snapshot.data?.todayRecipes ?? [];
-          // TODO: Replace this with TodayRecipeListView
-          return Center(
-            child: Container(
-              child: const Text('Show Today RecipeListView'),
-            ),
+          return ListView(
+            controller: _controller,
+            scrollDirection: Axis.vertical,
+            children: [
+              TodayRecipeListView(recipes: snapshot.data?.todayRecipes ?? []),
+              const SizedBox(height: 16),
+              FriendPostListView(friendPosts: snapshot.data?.friendPosts ?? []),
+            ],
           );
         } else {
-          // 6
           return const Center(
             child: CircularProgressIndicator(),
           );
